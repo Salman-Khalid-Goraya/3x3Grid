@@ -1,62 +1,99 @@
 import React from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
 import { target_images, non_target_images } from "../components/Image";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { addData } from "../slices/ExcelSlice";
 
 const SixgridPage = () => {
-  const { jsonData } = useParams();
+  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [images, setImages] = useState([]);
-  const [trialNumber, setTrialNumber] = useState(1);
+  const [imagesState, setImages] = useState([]);
+  const [trialNumber, setTrialNumber] = useState(4);
   const [tragetIndex, setTargetIndex] = useState();
   const [selectedImagesArray, setSelectedImagesArray] = useState([]);
   const [attempts, setAttempts] = useState(1);
-  const [jsonData1, setJsonData] = useState([]);
-  let i = 0;
+  let start = new Date().getTime();
 
   useEffect(() => {
-    let indexForTarget = Math.floor(Math.random() * 17);
-    let targetPhoto = target_images[indexForTarget];
-    setTargetIndex(indexForTarget);
-    setImages([]);
-    for (let k = 0; k < 35; k++) {
-      // let index = Math.floor(Math.random() * 22);
-      // setImages((images) => [...images, non_target_images[index]]);
-      setImages((images) => [...images, non_target_images[k]]);
-    }
-    setImages((images) => [...images, targetPhoto]);
+    let arr = [];
+    const subscribe = async () => {
+      let images = [];
+      let indexForTarget = Math.floor(Math.random() * 17);
+      let targetPhoto = target_images[indexForTarget];
+      for (let k = 0; k < 36; k++) {
+        let index = Math.floor(Math.random() * 56);
+        images.push(non_target_images[index]);
+      }
+      let targetIndex = Math.floor(Math.random() * 35);
+      setTargetIndex(targetIndex);
+      images[targetIndex] = targetPhoto;
+      return images;
+    };
+
+    subscribe().then((images) => {
+      arr.push(...images);
+      setImages(arr);
+    });
   }, []);
 
   function handleClickImage(image) {
     if (image?.category === "non-target") {
-      // console.log(selectedImagesArray);
-      // if (!selectedImagesArray.includes(image?.index)) {
       setAttempts(attempts + 1);
       setSelectedImagesArray((selectedImagesArray) => [
         ...selectedImagesArray,
         image?.index,
       ]);
-      // }
     } else if (image?.category === "target") {
-      console.log("Trial is", trialNumber);
+      setSelectedImagesArray([]);
+      const end = new Date().getTime();
+      const TimeTaken = end - start;
+      start = 0;
+      const subscibe = async (array) => {
+        console.log("Array before", array);
+        let newArray = array;
+        let indexForTarget = Math.floor(Math.random() * 10);
+        newArray[tragetIndex] = target_images[indexForTarget];
+        return newArray;
+      };
       setAttempts(attempts + 1);
-      setJsonData((jsonData1) => [
-        ...jsonData1,
-        { trial: trialNumber, attempts: attempts },
-      ]);
+      dispatch(
+        addData({
+          trial: trialNumber,
+          attempts: attempts,
+          time: TimeTaken / 100,
+        })
+      );
       if (trialNumber === 10) {
-        console.log("Trials are 10");
-        console.log(jsonData1);
-        navigate(`/thanks/${jsonData1}`);
+        let newArray = [];
+        subscibe(imagesState).then((data) => {
+          shuffleArray(data).then((data) => {
+            console.log("Array after", data);
+            newArray.push(...data);
+            setImages(newArray);
+          });
+        });
+        navigate(`/thanks`);
       } else {
-        setImages(shuffleArray(images));
+        let newArray = [];
+        subscibe(imagesState).then((data) => {
+          shuffleArray(data).then((data) => {
+            data.map((d, k) => {
+              if (d?.category === "target") {
+                setTargetIndex(k);
+              }
+            });
+            newArray.push(...data);
+            setImages(newArray);
+          });
+        });
         setAttempts(1);
         setTrialNumber(trialNumber + 1);
       }
     }
   }
 
-  function shuffleArray(array) {
+  async function shuffleArray(array) {
     for (let i = array.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * i);
       const temp = array[i];
@@ -69,9 +106,7 @@ const SixgridPage = () => {
     <div className="container">
       <div className="headerText">Practice Trial 6x6 Grid</div>
       <div className="image-grid-six">
-        {images.map((image, key) => {
-          // i = i + 1;
-          // if (i <= 9) {
+        {imagesState.map((image, key) => {
           return (
             <div
               className="grid-item"
@@ -83,6 +118,13 @@ const SixgridPage = () => {
                 width="60px"
                 height="60px"
                 alt={image?.index}
+                style={{
+                  opacity:
+                    selectedImagesArray.includes(image?.index) &&
+                    image?.category === "non-target"
+                      ? 0
+                      : 1,
+                }}
               />
             </div>
           );

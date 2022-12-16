@@ -9,8 +9,8 @@ export default function MainRoutes() {
     <Routes>
       <Route path="/" element={<LandingPage />} />
       <Route path="/3x3grid" element={<ThreegridPage />} />
-      <Route path="/6x6grid/:jsonData" element={<Sixgridpage />} />
-      <Route path="/thanks/:jsonData" element={<ThanksPage />} />
+      <Route path="/6x6grid" element={<Sixgridpage />} />
+      <Route path="/thanks" element={<ThanksPage />} />
     </Routes>
   );
 }

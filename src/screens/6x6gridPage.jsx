@@ -64,7 +64,7 @@ const SixgridPage = () => {
           time: TimeTaken / 100,
         })
       );
-      if (trialNumber === 10) {
+      if (trialNumber === 13) {
         let newArray = [];
         subscibe(imagesState).then((data) => {
           shuffleArray(data).then((data) => {

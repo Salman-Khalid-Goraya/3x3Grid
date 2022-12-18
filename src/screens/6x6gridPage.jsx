@@ -22,8 +22,9 @@ const SixgridPage = () => {
       let indexForTarget = Math.floor(Math.random() * 17);
       let targetPhoto = target_images[indexForTarget];
       for (let k = 0; k < 36; k++) {
-        let index = Math.floor(Math.random() * 56);
-        images.push(non_target_images[index]);
+        // let index = Math.floor(Math.random() * 56);
+        // images.push(non_target_images[index]);
+        images.push(non_target_images[k]);
       }
       let targetIndex = Math.floor(Math.random() * 35);
       setTargetIndex(targetIndex);
@@ -50,7 +51,6 @@ const SixgridPage = () => {
       const TimeTaken = end - start;
       start = 0;
       const subscibe = async (array) => {
-        console.log("Array before", array);
         let newArray = array;
         let indexForTarget = Math.floor(Math.random() * 10);
         newArray[tragetIndex] = target_images[indexForTarget];
@@ -68,7 +68,6 @@ const SixgridPage = () => {
         let newArray = [];
         subscibe(imagesState).then((data) => {
           shuffleArray(data).then((data) => {
-            console.log("Array after", data);
             newArray.push(...data);
             setImages(newArray);
           });

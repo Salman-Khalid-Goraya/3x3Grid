@@ -22,8 +22,9 @@ const ThreegridPage = () => {
       let indexForTarget = Math.floor(Math.random() * 17);
       let targetPhoto = target_images[indexForTarget];
       for (let k = 0; k < 9; k++) {
-        let index = Math.floor(Math.random() * 56);
-        images.push(non_target_images[index]);
+        // let index = Math.floor(Math.random() * 56);
+        // images.push(non_target_images[index]);
+        images.push(non_target_images[k]);
       }
       let targetIndex = Math.floor(Math.random() * 9);
       setTargetIndex(targetIndex);
